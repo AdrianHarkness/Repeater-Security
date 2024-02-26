@@ -187,7 +187,7 @@ def keyrate(N, Qx, pstar, epsilon=1e-36):
     '''
     #number of signals in measured test set
     #should I round to nearest integer?
-    m = round(.07*N)
+    m = np.round(.07*N)
     #number of signals remaining for secret key
     n = N-m
     #ideal state delta
@@ -234,7 +234,7 @@ def finite_BB84_keyrate_2(N, Q, epsilon=1e-36):
     """
     def single_rate(N,Q,epsilon): 
         #number of signals in measured test set
-        m = round(.07*N)
+        m = np.round(.07*N)
         #number of signals remaining for secret key
         n = N-m
         
@@ -277,7 +277,7 @@ def finite_BB84_keyrate(N, Q, epsilon=1e-36):
     Krawec Et. Al. 2022
     eq. 34
     """
-    m = round(.07*N)
+    m = np.round(.07*N)
     n = N-m
     #dimension
     d = 2
