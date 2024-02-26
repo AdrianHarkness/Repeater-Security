@@ -332,7 +332,7 @@ def plot_keyrate_vs_signalrounds(q, full_size, honest_sizes):
     #plt.grid(True)
     plt.xscale('log')
     plt.yscale('linear')
-    plt.ylim(0, .3)
+    #plt.ylim(0, .3)
     plt.xlim(1e5, 1e9)
     plt.xlabel('Number of Signals $N$')
     plt.ylabel('Key-Rate')
