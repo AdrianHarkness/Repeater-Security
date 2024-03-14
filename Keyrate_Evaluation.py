@@ -150,30 +150,31 @@ def noise_tolerance(keyrates, noises):
     tolerance = noises[index]
     return tolerance
 
-def plot_network_noise_vs_channel_noise(full_size, honest_size):
+def plot_network_noise_vs_channel_noise(full_size, honest_sizes):
     # define q values
     q_values = np.linspace(0, 1, 100)
 
-    # initialize lists to store Qx and pstar values
-    Qx_values = []
-    pstar_values = []
+    for honest_size in honest_sizes:
+        # initialize lists to store Qx and pstar values
+        Qx_values = []
+        pstar_values = []
 
-    # loop through q values and calculate Qx and pstar for each
-    for q in q_values:
-        # create network object
-        network_obj = network(full_size, honest_size, depolarization(q))
-        # append Qx and pstar values to lists
-        Qx_values.append(network_obj.Qx)
-        pstar_values.append(network_obj.pstar)
+        # loop through q values and calculate Qx and pstar for each
+        for q in q_values:
+            # create network object
+            network_obj = network(full_size, honest_size, depolarization(q))
+            # append Qx and pstar values to lists
+            Qx_values.append(network_obj.Qx)
+            pstar_values.append(network_obj.pstar)
 
-    # plot Qx and pstar as a function of channel noise
-    plt.plot(q_values, Qx_values, label='Measured Noise $Qx$')
-    plt.plot(q_values, pstar_values, label='Natural Depolarization $P*$')
+        # plot Qx and pstar as a function of channel noise
+        plt.plot(q_values, pstar_values, label=f'{honest_size} link $P*$')
+    plt.plot(q_values, Qx_values, linestyle='dotted', color='black', label='$Q_x$')
     plt.grid(True)
     plt.ylim(0, .6)
     plt.xlabel('Channel Depolarization $q$')
     plt.ylabel('Network Noise')
-    plt.title(f'{full_size} total links, {honest_size} honest links')
+    #plt.title(f'{full_size} total links, {honest_size} honest links')
     plt.legend()
     plt.show()
 
@@ -285,7 +286,7 @@ def finite_BB84_keyrate(N, Q, epsilon=1e-36):
     nu = np.sqrt(((n+m)*(m+1)*np.log(2/epsilon))/((m**2)*n))
     #keyrate
     keyrate = (n/N)*(np.log2(d) - 2*bin_entropy(Q + nu) - (Q + nu)*np.log2(d - 1))
-    #keyrate = (n/N)*(1-bin_entropy(Q + nu))
+    #keyrate = (n/N)*(1-2*bin_entropy(Q + nu))
     return keyrate
 
 def BB84_keyrate(noise):
@@ -370,28 +371,28 @@ def plot_keyrate_vs_Qx(full_size, honest_sizes, N):
     #plt.title(f'Finite-Key Rates for {full_size} Total Links, {N:.1e} Signal Rounds')
     plt.legend()
 
-    # Create inset of width 30% and height 30% of the parent axes' bounding box at the lower left corner (at 0.05, 0.1)
-    axins = plt.gca().inset_axes([.05, .1, 0.3, 0.3])
-    for honest_size in honest_sizes:
-        Qx_values = []
-        keyrates = []
-        for q in q_values:
-            network_obj = network(full_size, honest_size, depolarization(q))
-            Qx_values.append(network_obj.Qx)
-            keyrate_val = keyrate(N, network_obj.Qx, network_obj.pstar)
-            keyrates.append(keyrate_val)
-        axins.plot(Qx_values, keyrates, label=f'Honest links: {honest_size}')
-    axins.plot(np.linspace(0,.5,1000), finite_BB84_keyrate(N, np.linspace(0,.5,1000)), label='BB84-F', color='black', linestyle='dotted', linewidth=2)
-    axins.set_xlim(0, .05)  # apply the x-limits
-    axins.set_ylim(.2, 1)  # apply the y-limits
-    axins.set_xscale('linear')
-    axins.set_yscale('log')
-    axins.set_xticklabels([])  # remove xtick labels
-    axins.set_yticks([])  # remove yticks
-    axins.set_yticklabels([], minor=True)  # remove ytick labels
+    # # Create inset of width 30% and height 30% of the parent axes' bounding box at the lower left corner (at 0.05, 0.1)
+    # axins = plt.gca().inset_axes([.05, .1, 0.3, 0.3])
+    # for honest_size in honest_sizes:
+    #     Qx_values = []
+    #     keyrates = []
+    #     for q in q_values:
+    #         network_obj = network(full_size, honest_size, depolarization(q))
+    #         Qx_values.append(network_obj.Qx)
+    #         keyrate_val = keyrate(N, network_obj.Qx, network_obj.pstar)
+    #         keyrates.append(keyrate_val)
+    #     axins.plot(Qx_values, keyrates, label=f'Honest links: {honest_size}')
+    # axins.plot(np.linspace(0,.5,1000), finite_BB84_keyrate(N, np.linspace(0,.5,1000)), label='BB84-F', color='black', linestyle='dotted', linewidth=2)
+    # axins.set_xlim(0, .05)  # apply the x-limits
+    # axins.set_ylim(.2, 1)  # apply the y-limits
+    # axins.set_xscale('linear')
+    # axins.set_yscale('log')
+    # axins.set_xticklabels([])  # remove xtick labels
+    # axins.set_yticks([])  # remove yticks
+    # axins.set_yticklabels([], minor=True)  # remove ytick labels
 
-    # Add rectangle and connecting lines from the rectangle to the inset axes
-    plt.gca().indicate_inset_zoom(axins, edgecolor="black")
+    # # Add rectangle and connecting lines from the rectangle to the inset axes
+    # plt.gca().indicate_inset_zoom(axins, edgecolor="black")
 
     plt.show()
 
