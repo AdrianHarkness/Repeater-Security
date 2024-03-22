@@ -150,34 +150,6 @@ def noise_tolerance(keyrates, noises):
     tolerance = noises[index]
     return tolerance
 
-def plot_network_noise_vs_channel_noise(full_size, honest_sizes):
-    # define q values
-    q_values = np.linspace(0, 1, 100)
-
-    for honest_size in honest_sizes:
-        # initialize lists to store Qx and pstar values
-        Qx_values = []
-        pstar_values = []
-
-        # loop through q values and calculate Qx and pstar for each
-        for q in q_values:
-            # create network object
-            network_obj = network(full_size, honest_size, depolarization(q))
-            # append Qx and pstar values to lists
-            Qx_values.append(network_obj.Qx)
-            pstar_values.append(network_obj.pstar)
-
-        # plot Qx and pstar as a function of channel noise
-        plt.plot(q_values, pstar_values, label=f'{honest_size} link $P*$')
-    plt.plot(q_values, Qx_values, linestyle='dotted', color='black', label='$Q_x$')
-    plt.grid(True)
-    plt.ylim(0, .6)
-    plt.xlabel('Channel Depolarization $q$')
-    plt.ylabel('Network Noise')
-    #plt.title(f'{full_size} total links, {honest_size} honest links')
-    plt.legend()
-    plt.show()
-
 #finite-key rate for a noisy partially corrupted network (eq 67)
 def keyrate(N, Qx, pstar, epsilon=1e-36):
     '''
@@ -211,7 +183,6 @@ def keyrate(N, Qx, pstar, epsilon=1e-36):
     if keyrate > 1:
         keyrate = 1
     return keyrate
-
 #asymptotic key rate (eq 68)
 def keyrate_inf(Qx, pstar):
    
@@ -285,8 +256,8 @@ def finite_BB84_keyrate(N, Q, epsilon=1e-36):
     #confidence interval?
     nu = np.sqrt(((n+m)*(m+1)*np.log(2/epsilon))/((m**2)*n))
     #keyrate
-    keyrate = (n/N)*(np.log2(d) - 2*bin_entropy(Q + nu) - (Q + nu)*np.log2(d - 1))
-    #keyrate = (n/N)*(1-2*bin_entropy(Q + nu))
+    #keyrate = (n/N)*(np.log2(d) - 2.2*bin_entropy(Q + nu) - (Q + nu)*np.log2(d - 1))
+    keyrate = (n/N)*(1-2.2*bin_entropy(Q + nu))
     return keyrate
 
 def BB84_keyrate(noise):
@@ -304,10 +275,41 @@ def BB84_keyrate(noise):
         keyrate = max(0, min(keyrate, 1))
         return keyrate
 
-#finite key
+
+#plots
+def plot_network_noise_vs_channel_noise(full_size, honest_sizes):
+    # define q values
+    q_values = np.linspace(0, 1, 100)
+
+    for honest_size in honest_sizes:
+        # initialize lists to store Qx and pstar values
+        Qx_values = []
+        pstar_values = []
+
+        # loop through q values and calculate Qx and pstar for each
+        for q in q_values:
+            # create network object
+            network_obj = network(full_size, honest_size, depolarization(q))
+            # append Qx and pstar values to lists
+            Qx_values.append(network_obj.Qx)
+            pstar_values.append(network_obj.pstar)
+
+        # plot Qx and pstar as a function of channel noise
+        plt.plot(q_values, pstar_values, label=f'Honest links: {honest_size}')
+    plt.plot(q_values, Qx_values, linestyle='dotted', color='black')
+    plt.text(0.4, 0.5, '$Q_x$', color='black', fontsize=12, ha='center', va='center')
+    plt.grid(True)
+    plt.ylim(0, .6)
+    plt.xlim(0, .5)
+    plt.xlabel('Channel Depolarization $q$')
+    plt.ylabel('$p^*$')
+    #plt.title(f'{full_size} total links, {honest_size} honest links')
+    plt.legend()
+    plt.show()
+
 def plot_keyrate_vs_signalrounds(q, full_size, honest_sizes):
     # define range of signal rounds
-    signal_rounds = np.logspace(4, 9, num=10000)
+    signal_rounds = np.logspace(4, 15, num=10000)
     # loop through honest sizes
     for honest_size in honest_sizes:
         # network object
@@ -323,6 +325,7 @@ def plot_keyrate_vs_signalrounds(q, full_size, honest_sizes):
         plt.plot(signal_rounds, keyrates, label=f'Honest links: {honest_size}')
     #BB84
     BB84_keyrates = []
+    #fully corrupt network
     network_obj = network(full_size, 0, depolarization(q))
     print(f"Network Noise: {network_obj.Qx}")
     for signal in signal_rounds:
@@ -333,15 +336,14 @@ def plot_keyrate_vs_signalrounds(q, full_size, honest_sizes):
     #plt.grid(True)
     plt.xscale('log')
     plt.yscale('linear')
-    #plt.ylim(0, .3)
-    plt.xlim(1e5, 1e9)
+    plt.ylim(0, .3)
+    plt.xlim(1e5, 1e11)
     plt.xlabel('Number of Signals $N$')
     plt.ylabel('Key-Rate')
     #plt.title(f'{full_size} total links, {q*100}% channel depolarization')
     plt.legend()
     plt.show()
 
-#finite key
 def plot_keyrate_vs_Qx(full_size, honest_sizes, N):
     # define q values
     q_values = np.linspace(0, 1, 10000)
@@ -365,7 +367,8 @@ def plot_keyrate_vs_Qx(full_size, honest_sizes, N):
     #plt.grid(True)
     plt.xscale('linear')
     plt.yscale('log')
-    plt.xlim(0,.2)
+    plt.xlim(0,.15)
+    plt.ylim(1e-4, 1)
     plt.xlabel('Noise $Q_x$')
     plt.ylabel('Key-Rate')
     #plt.title(f'Finite-Key Rates for {full_size} Total Links, {N:.1e} Signal Rounds')
@@ -421,6 +424,7 @@ def plot_asymptotic_keyrate_vs_Qx(full_size, honest_sizes):
     plt.xscale('linear')
     plt.yscale('log')
     plt.xlim(0,.2)
+    plt.ylim(1e-4, 1)
     plt.xlabel('Noise $Q_x$')
     plt.ylabel('Asymptotic Key-Rate')
     #plt.title(f'Asymptotic Key Rates for {full_size} Total Links')
