@@ -1,1 +1,1 @@
-Finite-key and asymptotic QKD key rate evaluations for partialy corrupted quantum repeater networks.
+Finite-key and asymptotic QKD key rate evaluations for partially corrupted quantum repeater networks.
