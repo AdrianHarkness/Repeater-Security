@@ -254,7 +254,7 @@ def finite_BB84_keyrate(N, Q, epsilon=1e-36):
     #dimension
     d = 2
     #confidence interval?
-    nu = np.sqrt(((n+m)*(m+1)*np.log(2/epsilon))/((m**2)*n))
+    nu = np.sqrt(((N)*(m+1)*np.log(2/epsilon))/((m**2)*n))
     #keyrate
     #keyrate = (n/N)*(np.log2(d) - 2.2*bin_entropy(Q + nu) - (Q + nu)*np.log2(d - 1))
     keyrate = (n/N)*(1-2.2*bin_entropy(Q + nu))
@@ -297,7 +297,7 @@ def plot_network_noise_vs_channel_noise(full_size, honest_sizes):
         # plot Qx and pstar as a function of channel noise
         plt.plot(q_values, pstar_values, label=f'Honest links: {honest_size}')
     plt.plot(q_values, Qx_values, linestyle='dotted', color='black')
-    plt.text(0.4, 0.5, '$Q_x$', color='black', fontsize=12, ha='center', va='center')
+    plt.text(0.4, 0.5, '$w(Q_x)$', color='black', fontsize=12, ha='center', va='center')
     plt.grid(True)
     plt.ylim(0, .6)
     plt.xlim(0, .5)
@@ -369,7 +369,7 @@ def plot_keyrate_vs_Qx(full_size, honest_sizes, N):
     plt.yscale('log')
     plt.xlim(0,.15)
     plt.ylim(1e-4, 1)
-    plt.xlabel('Noise $Q_x$')
+    plt.xlabel('Noise $w(Q_x)$')
     plt.ylabel('Key-Rate')
     #plt.title(f'Finite-Key Rates for {full_size} Total Links, {N:.1e} Signal Rounds')
     plt.legend()
@@ -425,7 +425,7 @@ def plot_asymptotic_keyrate_vs_Qx(full_size, honest_sizes):
     plt.yscale('log')
     plt.xlim(0,.2)
     plt.ylim(1e-4, 1)
-    plt.xlabel('Noise $Q_x$')
+    plt.xlabel('Noise $w(Q_x)$')
     plt.ylabel('Asymptotic Key-Rate')
     #plt.title(f'Asymptotic Key Rates for {full_size} Total Links')
     plt.legend()
