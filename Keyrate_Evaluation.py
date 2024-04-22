@@ -339,8 +339,9 @@ def plot_keyrate_vs_signalrounds(q, full_size, honest_sizes):
     plt.xlabel('Number of Signals $N$')
     plt.ylabel('Key-Rate')
     #plt.title(f'{full_size} total links, {q*100}% channel depolarization')
-    plt.legend()
+    plt.legend(loc='upper left')
     plt.show()
+    
 
 def plot_keyrate_vs_Qx(full_size, honest_sizes, N):
     # define q values
