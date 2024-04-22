@@ -176,7 +176,7 @@ def keyrate(N, Qx, pstar, epsilon=1e-36):
         #Q = ((Qx - pstar + delta_prime)/(1-2*pstar)) + delta #39
         #keyrate = (n/N)*(1 - bin_entropy(Q) - (bin_entropy(Qx))) #39
         Q = ((Qx - pstar + delta_prime)/(1-2*pstar)) #67
-        keyrate = (n/N)*(1 - bin_entropy(Q)) - 1.2*(bin_entropy(Qx)) - (np.log2(1/epsilon))/N #67
+        keyrate = (n/N)*(1 - bin_entropy(Q) - 1.2*(bin_entropy(Qx))) - (np.log2(1/epsilon))/N #67
     
     #bound keyrates to be between 0 and 1
     #keyrate = max(0, keyrate)
@@ -320,14 +320,12 @@ def plot_keyrate_vs_signalrounds(q, full_size, honest_sizes):
         for signal in signal_rounds:
             keyrate_val = keyrate(signal, network_obj.Qx, network_obj.pstar)
             keyrates.append(keyrate_val)
-        print(f"Network: {honest_size}/{full_size}")
         # plot key rate as a function of signal rounds
         plt.plot(signal_rounds, keyrates, label=f'Honest links: {honest_size}')
     #BB84
     BB84_keyrates = []
     #fully corrupt network
     network_obj = network(full_size, 0, depolarization(q))
-    print(f"Network Noise: {network_obj.Qx}")
     for signal in signal_rounds:
         keyrate_val = finite_BB84_keyrate(signal, network_obj.Qx)
         BB84_keyrates.append(keyrate_val)
@@ -360,7 +358,6 @@ def plot_keyrate_vs_Qx(full_size, honest_sizes, N):
             Qx_values.append(network_obj.Qx)
             keyrate_val = keyrate(N, network_obj.Qx, network_obj.pstar)
             keyrates.append(keyrate_val)
-        print(f"Network: {honest_size}/{full_size}")
         # plot key rate as a function of Qx
         plt.plot(Qx_values, keyrates, label=f'Honest links: {honest_size}')
     plt.plot(np.linspace(0,.5,1000), finite_BB84_keyrate(N, np.linspace(0,.5,1000)), label='BB84-F', color='black', linestyle='dotted', linewidth=2)
@@ -415,7 +412,6 @@ def plot_asymptotic_keyrate_vs_Qx(full_size, honest_sizes):
             Qx_values.append(network_obj.Qx)
             keyrate_inf_val = keyrate_inf(network_obj.Qx, network_obj.pstar)
             keyrates.append(keyrate_inf_val)
-        print(f"Network: {honest_size}/{full_size}")
         # plot key rate as a function of Qx
         plt.plot(Qx_values, keyrates, label=f'Honest links: {honest_size}')
     
@@ -463,7 +459,6 @@ def plot_noise_tolerance_vs_honest_links(full_size, honest_sizes, N):
         # append noise tolerance to list
         tolerances.append(tolerance)
         inf_tolerances.append(inf_tolerance)
-        print(f"Honest size: {honest_size}/{full_size}", "Noise tolerance:", tolerance, "Inf tolerance:", inf_tolerance)
 
     bb84_keyrates = []
     for noise in Qx_values:
