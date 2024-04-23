@@ -173,9 +173,7 @@ def keyrate(N, Qx, pstar, epsilon=1e-36):
     if pstar == 0.5:
         keyrate = (-1.2*(bin_entropy(Qx))) / N
     else:
-        #Q = ((Qx - pstar + delta_prime)/(1-2*pstar)) + delta #39
-        #keyrate = (n/N)*(1 - bin_entropy(Q) - (bin_entropy(Qx))) #39
-        Q = ((Qx - pstar + delta_prime)/(1-2*pstar)) #67
+        Q = ((Qx - pstar + delta_prime)/(1-2*pstar))+delta #67
         keyrate = (n/N)*(1 - bin_entropy(Q) - 1.2*(bin_entropy(Qx))) - (np.log2(1/epsilon))/N #67
     
     #bound keyrates to be between 0 and 1
@@ -183,6 +181,7 @@ def keyrate(N, Qx, pstar, epsilon=1e-36):
     if keyrate > 1:
         keyrate = 1
     return keyrate
+
 #asymptotic key rate (eq 68)
 def keyrate_inf(Qx, pstar):
    
@@ -198,7 +197,8 @@ def keyrate_inf(Qx, pstar):
         keyrate = 1
     return keyrate
 
-def finite_BB84_keyrate_2(N, Q, epsilon=1e-36):
+#Don't use
+def BB84_F_2(N, Q, epsilon=1e-36):
     """
     Quantum Sampling for Finite-Key Rates in High Dimensional Quantum Cryptography
     Krawec Et. Al. 2022
@@ -243,7 +243,8 @@ def finite_BB84_keyrate_2(N, Q, epsilon=1e-36):
     keyrates = np.vectorize(single_rate)(N, Q, epsilon)
     return keyrates
 
-def finite_BB84_keyrate(N, Q, epsilon=1e-36):
+#Use this instead
+def BB84_F(N, Q, epsilon=1e-36):
     """
     Quantum Sampling for Finite-Key Rates in High Dimensional Quantum Cryptography
     Krawec Et. Al. 2022
@@ -260,7 +261,8 @@ def finite_BB84_keyrate(N, Q, epsilon=1e-36):
     keyrate = (n/N)*(1-2.2*bin_entropy(Q + nu))
     return keyrate
 
-def BB84_keyrate(noise):
+#asymptotic BB84 keyrate
+def BB84_A(noise):
     # Check if noise is a list
     if isinstance(noise, np.ndarray) or isinstance(noise, list):
         # Calculate keyrate for each noise value
@@ -327,7 +329,7 @@ def plot_keyrate_vs_signalrounds(q, full_size, honest_sizes):
     #fully corrupt network
     network_obj = network(full_size, 0, depolarization(q))
     for signal in signal_rounds:
-        keyrate_val = finite_BB84_keyrate(signal, network_obj.Qx)
+        keyrate_val = BB84_F(signal, network_obj.Qx)
         BB84_keyrates.append(keyrate_val)
     plt.plot(signal_rounds, BB84_keyrates, color='black', label='BB84-F', linestyle='dotted', linewidth=2)
 
@@ -361,7 +363,7 @@ def plot_keyrate_vs_Qx(full_size, honest_sizes, N):
             keyrates.append(keyrate_val)
         # plot key rate as a function of Qx
         plt.plot(Qx_values, keyrates, label=f'Honest links: {honest_size}')
-    plt.plot(np.linspace(0,.5,1000), finite_BB84_keyrate(N, np.linspace(0,.5,1000)), label='BB84-F', color='black', linestyle='dotted', linewidth=2)
+    plt.plot(np.linspace(0,.5,1000), BB84_F(N, np.linspace(0,.5,1000)), label='BB84-F', color='black', linestyle='dotted', linewidth=2)
     #plt.grid(True)
     plt.xscale('linear')
     plt.yscale('log')
@@ -383,7 +385,7 @@ def plot_keyrate_vs_Qx(full_size, honest_sizes, N):
     #         keyrate_val = keyrate(N, network_obj.Qx, network_obj.pstar)
     #         keyrates.append(keyrate_val)
     #     axins.plot(Qx_values, keyrates, label=f'Honest links: {honest_size}')
-    # axins.plot(np.linspace(0,.5,1000), finite_BB84_keyrate(N, np.linspace(0,.5,1000)), label='BB84-F', color='black', linestyle='dotted', linewidth=2)
+    # axins.plot(np.linspace(0,.5,1000), BB84_F(N, np.linspace(0,.5,1000)), label='BB84-F', color='black', linestyle='dotted', linewidth=2)
     # axins.set_xlim(0, .05)  # apply the x-limits
     # axins.set_ylim(.2, 1)  # apply the y-limits
     # axins.set_xscale('linear')
@@ -416,7 +418,7 @@ def plot_asymptotic_keyrate_vs_Qx(full_size, honest_sizes):
         # plot key rate as a function of Qx
         plt.plot(Qx_values, keyrates, label=f'Honest links: {honest_size}')
     
-    plt.plot(np.linspace(0,.5,1000), BB84_keyrate(np.linspace(0,.5,1000)), color = 'black', label='BB84-A', linestyle='dotted', linewidth=2)
+    plt.plot(np.linspace(0,.5,1000), BB84_A(np.linspace(0,.5,1000)), color = 'black', label='BB84-A', linestyle='dotted', linewidth=2)
     #plt.grid(True)
     plt.xscale('linear')
     plt.yscale('log')
@@ -463,7 +465,7 @@ def plot_noise_tolerance_vs_honest_links(full_size, honest_sizes, N):
 
     bb84_keyrates = []
     for noise in Qx_values:
-        bb84_keyrates.append(max(0,finite_BB84_keyrate(N, noise)))
+        bb84_keyrates.append(max(0,BB84_F(N, noise)))
     finite_BB84_tolerance = noise_tolerance(bb84_keyrates, Qx_values)
     
     #splines
