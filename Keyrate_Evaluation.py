@@ -212,7 +212,7 @@ def general_network_keyrate(Qx, N, p_array, m_array, epsilon=1e-36):
 
     #Maximize adversarial error
     w = w_tilde(Qx, delta_prime, p_array, m_array) #71
-    print(w)
+    #print(w)
     Q = w + delta
     #keyrate evaluation
     leak_ec = 1.2*(bin_entropy(Qx + delta))

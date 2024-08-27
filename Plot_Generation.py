@@ -233,7 +233,7 @@ def plot_general_keyrate_vs_signalrounds(Qx_array, p, m):
         for signal in signal_rounds:
             keyrate_val = BB84_F(signal, Qx)
             BB84_keyrates.append(keyrate_val)
-        plt.plot(signal_rounds, BB84_keyrates, label='BB84-F', linestyle='dotted', linewidth=2)
+        plt.plot(signal_rounds, BB84_keyrates, label=f'BB84-F ({int(Qx*100)}% Noise)', linestyle='dotted', linewidth=2)
 
     #plt.grid(True)
     plt.xscale('log')
