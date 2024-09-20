@@ -1,2 +1,2 @@
 Finite-key and asymptotic QKD key rate evaluations for partially corrupted quantum repeater networks.
-Paper: https://arxiv.org/abs/2406.16651
+Paper: (https://iopscience.iop.org/article/10.1088/2058-9565/ad7882/meta)
